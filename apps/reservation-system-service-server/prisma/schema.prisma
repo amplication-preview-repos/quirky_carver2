@@ -1,0 +1,51 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Guide {
+  id           String       @id @default(cuid())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  rating       Float?
+  availability Json?
+  coverage     Json?
+  name         String?
+  bio          String?
+  experiences  Experience[]
+}
+
+model Experience {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String?
+  duration    Int?
+  price       Float?
+  pricingRule Json?
+  description String?
+  guide       Guide?    @relation(fields: [guideId], references: [id])
+  guideId     String?
+  bookings    Booking[]
+}
+
+model Booking {
+  id               String             @id @default(cuid())
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  date             DateTime?
+  duration         Int?
+  status           EnumBookingStatus?
+  confirmedByGuide Boolean?
+  user             String?
+  experience       Experience?        @relation(fields: [experienceId], references: [id])
+  experienceId     String?
+}
+
+enum EnumBookingStatus {
+  Option1
+}
