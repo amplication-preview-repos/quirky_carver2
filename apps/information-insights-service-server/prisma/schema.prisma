@@ -1,0 +1,80 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  description   String?
+  name          String?
+  subcategories Subcategory[]
+  places        Place[]
+}
+
+model Subcategory {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  description      String?
+  name             String?
+  category         Category?        @relation(fields: [categoryId], references: [id])
+  categoryId       String?          @db.ObjectId
+  subSubcategories SubSubcategory[]
+  places           Place[]
+}
+
+model Recommendation {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String?
+  details   String?
+  place     Place?   @relation(fields: [placeId], references: [id])
+  placeId   String?  @db.ObjectId
+}
+
+model SubSubcategory {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  description   String?
+  name          String?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategoryId String?      @db.ObjectId
+  places        Place[]
+}
+
+model SearchInput {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  filters   Json?
+  query     String?
+}
+
+model Place {
+  id               String              @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  name             String?
+  description      String?
+  location         Json?
+  typeField        EnumPlaceTypeField?
+  subcategory      Subcategory?        @relation(fields: [subcategoryId], references: [id])
+  subcategoryId    String?             @db.ObjectId
+  subSubcategory   SubSubcategory?     @relation(fields: [subSubcategoryId], references: [id])
+  subSubcategoryId String?             @db.ObjectId
+  category         Category?           @relation(fields: [categoryId], references: [id])
+  categoryId       String?             @db.ObjectId
+  recommendations  Recommendation[]
+}
+
+enum EnumPlaceTypeField {
+  Option1
+}
